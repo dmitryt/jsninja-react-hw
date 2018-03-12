@@ -1,0 +1,40 @@
+.b-autocomplete {
+  text-align: left;
+}
+
+.b-autocomplete .b-autocomplete-input {
+  border: 1px solid silver;
+  outline: none;
+  margin: 0;
+  background: #fff;
+}
+
+.b-autocomplete .b-autocomplete-result {
+  border: 1px solid silver;
+  border-top: 0;
+  position: absolute;
+  overflow: auto;
+  max-height: 93px;
+  background: #fff;
+}
+
+.b-autocomplete .b-autocomplete-input,
+.b-autocomplete .b-autocomplete-result {
+  width: 200px;
+  box-sizing: border-box;
+}
+
+.b-autocomplete .b-autocomplete-input,
+.b-autocomplete .b-autocomplete-result p {
+  padding: 4px;
+  margin: 0;
+  color: #000;
+}
+
+.b-autocomplete .b-autocomplete-result p:nth-child(2n+1) {
+  background: #f6f6f6;
+}
+
+.b-autocomplete .b-autocomplete-result p:hover {
+  background: #e5e5e5;
+}
