@@ -1,12 +1,12 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 
-import Autocomplete from '../components/Autocomplete';
+import Autocomplete from './index';
 
 const simpleItems = [
-  { value: 'some value', label: 'some label' },
-  { value: 'some value2', label: 'some label2' },
-  { value: 'some value3', label: 'some label3' },
+	{ value: 'robertdeniro', label: 'Robert De Niro' },
+	{ value: 'tomhanks', label: 'Tom Hanks' },
+	{ value: 'russellcrowe', label: 'Russell Crowe' },
 ];
 
 const listOfCryptoCurrencies = [

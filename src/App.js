@@ -7,9 +7,9 @@ import './App.css';
 class App extends Component {
   render() {
     const items = [
-      { value: 'some value', label: 'some label' },
-      { value: 'some value2', label: 'some label2' },
-      { value: 'some value3', label: 'some label3' },
+      { value: 'robertdeniro', label: 'Robert De Niro' },
+      { value: 'tomhanks', label: 'Tom Hanks' },
+      { value: 'russellcrowe', label: 'Russell Crowe' },
     ];
     const getItems = text => {
       const result = items.filter(i => i.label.includes(text));

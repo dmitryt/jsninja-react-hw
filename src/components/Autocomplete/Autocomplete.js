@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './style.css';
 
@@ -18,7 +19,7 @@ const Autocomplete = ({ inputValue, isDropdownVisible, setFocused, items, onInpu
 			<div className="b-autocomplete-result">
 				{
 					items.map(props =>
-						<p key={props.value} onMouseDown={() => onInputChange({ displayedValue: props.label, value: props.value })}>
+						<p className="b-autocomplete-result__item" key={props.value} onMouseDown={() => onInputChange({ displayedValue: props.label, value: props.value })}>
 							<ListItemComponent {...props} />
 						</p>
 					)
@@ -28,9 +29,17 @@ const Autocomplete = ({ inputValue, isDropdownVisible, setFocused, items, onInpu
 	</div>
 );
 
+Autocomplete.propTypes = {
+	getItems: PropTypes.func.isRequired,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  ListItemComponent: PropTypes.func,
+};
+
 Autocomplete.defaultProps = {
+	value: '',
+	onChange: () => {},
 	ListItemComponent: DefaultDropdownListItem,
-	items: [],
 };
 
 export default Autocomplete;

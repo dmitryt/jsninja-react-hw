@@ -4,47 +4,33 @@ import Autocomplete from './Autocomplete';
 
 const noop = () => { };
 
-const withItems = compose(
+export const withValue = compose(
 	withState('items', 'setItems', []),
-	mapProps(({ getItems, setItems, ...props }) => ({
-		...props,
-		getItems: value => {
-			return getItems(value).then(items => {
-				setItems(items);
-			});
-		}
-	}))
-);
-
-const withValue = compose(
 	withState('inputValue', 'setInputValue', ''),
 	withHandlers({
-		onInputChange: ({ getItems, onChange = noop, setInputValue }) => ({ displayedValue, value }) => {
+		onInputChange: ({ getItems, setItems, setInputValue, onChange = noop }) => ({ displayedValue, value }) => {
 			setInputValue(displayedValue);
-			getItems(displayedValue);
+			getItems(displayedValue).then(setItems);
 			onChange(value);
 		}
 	}),
 	lifecycle({
 		componentDidMount() {
-			if (this.props.value !== undefined) {
-				this.initInitialValue(this.props.value);
+			const { value, setInputValue } = this.props;
+			if (value !== undefined) {
+				setInputValue(value);
 			}
 		},
-		componentWillReceiveProps({ value }) {
-			if (this.props.value !== value) {
-				this.initInitialValue(value);
+		componentWillReceiveProps(nextProps) {
+			const { value, setInputValue } = this.props;
+			if (nextProps.value !== value) {
+				setInputValue(nextProps.value);
 			}
-		},
-		initInitialValue(value) {
-			const { setInputValue, getItems } = this.props;
-			setInputValue(value);
-			getItems(value);
 		}
 	}),
 );
 
-const withFocusManagement = compose(
+export const withFocusManagement = compose(
 	withState('isFocused', 'setFocused', false),
 	mapProps(({ isFocused, ...props }) => ({
 		...props,
@@ -53,7 +39,6 @@ const withFocusManagement = compose(
 );
 
 export default compose(
-	withItems,
 	withValue,
 	withFocusManagement,
 )(Autocomplete);
