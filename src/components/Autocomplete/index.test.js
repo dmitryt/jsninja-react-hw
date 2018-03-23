@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import WrappedComponent, { withValue, withFocusManagement } from './index';
+import WrappedComponent, { withItems, withValue, withFocusManagement } from './index';
 import Autocomplete from './Autocomplete';
 
 describe('Component Autocomplete', () => {
@@ -44,7 +44,51 @@ describe('Component Autocomplete', () => {
     expect(input.instance().value).toBe('234');
   });
 
-  describe('entering the value', () => {
+  describe('withItems', () => {
+    const Component = withItems(Autocomplete);
+    const items = [
+      { label: '123', value: '345' },
+      { label: '567', value: '789' },
+    ];
+
+    it('should update list of dropdown values, when input value is changed', done => {
+      const onInputChange = () => { };
+      const getItems = jest.fn().mockImplementation(() => Promise.resolve(items));
+      const component = setupComponent({ getItems, onInputChange, isDropdownVisible: true }, Component);
+      const cProps = component.find(Autocomplete).props();
+
+      expect(getDropdownItems(component)).toHaveLength(0);
+      cProps.getItems('123');
+
+      setTimeout(() => {
+        component.update();
+        expect(getDropdownItems(component)).toHaveLength(2);
+        done();
+      }, 0);
+    });
+
+    it('should abort previous promise, if it\'s not resolved', () => {
+      const onInputChange = () => { };
+      const promises = [];
+      const getItems = () => {
+        const p = new Promise((resolve, reject) => setTimeout(() => resolve(items), 2000));
+        p.abort = jest.fn();
+        promises.push(p);
+        return p;
+      };
+      const component = setupComponent({ getItems, onInputChange }, Component);
+      const cProps = component.find(Autocomplete).props();
+
+      cProps.getItems('123');
+      expect(promises[0].abort.mock.calls.length).toBe(0);
+      cProps.getItems('234');
+      expect(promises.length).toBe(2);
+      expect(promises[0].abort.mock.calls.length).toBe(1);
+      expect(promises[1].abort.mock.calls.length).toBe(0);
+    });
+  });
+
+  describe('withValue', () => {
     const Component = withValue(Autocomplete);
 
     it('should update input value correctly, when user enters value', () => {
@@ -67,6 +111,17 @@ describe('Component Autocomplete', () => {
       expect(onChange.mock.calls[0]).toEqual([null]);
     });
 
+    it('should call "getItems", when user enters value', () => {
+      const getItems = jest.fn();
+      const component = setupComponent({ getItems }, Component);
+      const input = getInput(component);
+
+      input.simulate('change', { target: { value: '123' } });
+
+      expect(getItems.mock.calls.length).toBe(1);
+      expect(getItems.mock.calls[0]).toEqual(['123']);
+    });
+
     it('should filter items, when user enters value', () => {
       const getItems = jest.fn().mockImplementation(() => Promise.resolve([]));
       const component = setupComponent({ getItems }, Component);
@@ -78,38 +133,27 @@ describe('Component Autocomplete', () => {
       expect(getItems.mock.calls[0]).toEqual(['12']);
     });
 
-    it('should render items, when user enters value', done => {
-      const filteredItems = [
+    it('should render items, when user enters value', () => {
+      const items = [
         { label: '123', value: '345' }
       ];
-      const getItems = jest.fn().mockImplementation(() => Promise.resolve(filteredItems));
-      const component = setupComponent({ getItems, isDropdownVisible: true }, Component);
+      const getItems = () => component.setProps({ items });
+      const component = setupComponent({ items: [], getItems, isDropdownVisible: true }, Component);
       const input = getInput(component);
 
       expect(getDropdownItems(component)).toHaveLength(0);
       input.simulate('change', { target: { value: '12' } });
 
-      setTimeout(() => {
-        component.update();
-        expect(getDropdownItems(component)).toHaveLength(1);
-        done();
-      }, 0);
+      expect(getDropdownItems(component)).toHaveLength(1);
     });
-  });
-
-  describe('selecting the value', () => {
-    const Component = withValue(Autocomplete);
-    const items = [
-      { label: '123', value: '345' },
-      { label: '567', value: '789' },
-    ];
 
     it('should update input value correctly, when user selects value', () => {
-      const component = setupComponent({ isDropdownVisible: true }, Component);
+      const items = [
+        { label: '123', value: '345' },
+        { label: '567', value: '789' },
+      ];
+      const component = setupComponent({ items, isDropdownVisible: true }, Component);
       const input = getInput(component);
-
-      component.find(Autocomplete).prop('setItems')(items); // Dirty hack with initial rendering of dropdown
-      component.update();
 
       expect(input.instance().value).toBe('');
       getDropdownItems(component).first().simulate('mousedown');
@@ -118,10 +162,11 @@ describe('Component Autocomplete', () => {
 
     it('should call callback, when user selects value', () => {
       const onChange = jest.fn();
-      const component = setupComponent({ onChange, isDropdownVisible: true }, Component);
-
-      component.find(Autocomplete).prop('setItems')(items); // Dirty hack with initial rendering of dropdown
-      component.update();
+      const items = [
+        { label: '123', value: '345' },
+        { label: '567', value: '789' },
+      ];
+      const component = setupComponent({ items, onChange, isDropdownVisible: true }, Component);
 
       getDropdownItems(component).first().simulate('mousedown');
 
@@ -130,7 +175,7 @@ describe('Component Autocomplete', () => {
     });
   });
 
-  describe('showing/hiding the dropdown', () => {
+  describe('withFocusManagement', () => {
     const Component = withFocusManagement(Autocomplete);
 
     it('should show/hide dropdown, when input field gets/looses a focus', () => {

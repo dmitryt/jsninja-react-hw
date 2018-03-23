@@ -12,7 +12,7 @@ class App extends Component {
       { value: 'russellcrowe', label: 'Russell Crowe' },
     ];
     const getItems = text => {
-      const result = items.filter(i => i.label.includes(text));
+      const result = items.filter(i => i.label.startsWith(text));
       return Promise.resolve(result);
     };
     const onChange = (v) => console.log('selected', v);

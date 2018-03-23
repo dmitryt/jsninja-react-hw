@@ -4,13 +4,33 @@ import Autocomplete from './Autocomplete';
 
 const noop = () => { };
 
-export const withValue = compose(
+let lastPromise = null;
+
+export const withItems = compose(
 	withState('items', 'setItems', []),
+	mapProps(({ getItems, setItems, ...props }) => ({
+		...props,
+		getItems: value => {
+			if (lastPromise && typeof lastPromise.abort === 'function') {
+				lastPromise.abort();
+				lastPromise = null;
+			}
+			lastPromise = getItems(value);
+			lastPromise
+				.then(setItems)
+				.then(() => lastPromise = null)
+				.catch(() => lastPromise = null) // Promise#finally doesn't work in tests
+				;
+		}
+	}))
+)
+
+export const withValue = compose(
 	withState('inputValue', 'setInputValue', ''),
 	withHandlers({
-		onInputChange: ({ getItems, setItems, setInputValue, onChange = noop }) => ({ displayedValue, value }) => {
+		onInputChange: ({ getItems, setInputValue, onChange = noop }) => ({ displayedValue, value }) => {
 			setInputValue(displayedValue);
-			getItems(displayedValue).then(setItems);
+			getItems(displayedValue);
 			onChange(value);
 		}
 	}),
@@ -39,6 +59,7 @@ export const withFocusManagement = compose(
 );
 
 export default compose(
+	withItems,
 	withValue,
 	withFocusManagement,
 )(Autocomplete);

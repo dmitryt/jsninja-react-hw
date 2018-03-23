@@ -15,7 +15,7 @@ const listOfCryptoCurrencies = [
 ];
 
 const getItems = (items = simpleItems) => text => {
-  const result = items.filter(i => i.label.includes(text));
+  const result = items.filter(i => i.label.startsWith(text));
   return Promise.resolve(result);
 };
 
