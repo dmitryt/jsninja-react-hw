@@ -1,5 +1,7 @@
-.b-crypto-chart {
-	.increased {
-		color: green;
-	}
+.b-crypto-chart .increased {
+	color: green;
+}
+
+.b-crypto-chart .decreased {
+	color: red;
 }

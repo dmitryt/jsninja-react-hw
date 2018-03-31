@@ -8,7 +8,7 @@ import Chart from './Chart';
 import './style.css';
 
 const CryptoCurrencyChart = ({ values, currency, baseCurrency, maxChartValues }) => (
-	<div>
+	<div className="b-crypto-chart">
 		<Currency value={currency} />
 		<Price values={values} currency={baseCurrency} />
 		<Chart width={600} height={200} values={values.slice(-maxChartValues)} />

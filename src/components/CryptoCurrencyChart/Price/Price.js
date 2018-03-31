@@ -9,17 +9,22 @@ const className = value => classNames({
 	decreased: value < 0,
 });
 
-const Price = ({ value, currency, delta }) => (
+const Price = ({ value, currency, startDelta, lastDelta }) => (
 	<div>
-		{formatCurrency({ value, currency })} (<span className={className(value)}>{toPercent(delta)}</span>)
+		<span className={className(lastDelta)}>{formatCurrency({ value, currency })}</span>
+		&nbsp;<span className={className(startDelta)}>({toPercent(startDelta)})</span>
 	</div>
 );
 
 Price.propTypes = {
 	value: PropTypes.number.isRequired,
+	startDelta: PropTypes.number,
+	lastDelta: PropTypes.number,
 };
 
 Price.defaultProps = {
+	startDelta: 0,
+	lastDelta: 0,
 };
 
 export default Price;

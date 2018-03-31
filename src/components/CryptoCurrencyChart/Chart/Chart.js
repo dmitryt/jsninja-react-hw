@@ -10,6 +10,7 @@ const Chart = ({ values, color, height, width }) => (
 			strokeWidth="2"
 		/>
 		<polygon points={values.concat([width, height, 0, height]).join(' ')} fill={color} fillOpacity="0.2" />
+		<line x1="0" y1={height} x2={width} y2={height} stroke="green" strokeWidth="4" />
 	</svg>
 );
 

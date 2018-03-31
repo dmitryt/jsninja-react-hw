@@ -7,13 +7,12 @@ import './App.css';
 
 class App extends Component {
   state = {
-    values: [9874.24, 9651.12, 9650.23, 9532.12, 9412.21, 8999.23, 8712.23, 9912.32, 10133.23, 9712.22],
+    values: [],
   }
   componentDidMount() {
-    console.log(this.state.values);
     setInterval(() => {
       const { values } = this.state;
-      const generate = () => 9000 + parseFloat(Math.random() * 500, 10);
+      const generate = () => 9000 + parseFloat(Math.random() * 1000, 10);
       this.setState({ values: values.concat([generate()]) });
     }, 1000);
   }
@@ -35,7 +34,7 @@ class App extends Component {
         <CryptoCurrencyChart
           currency="BTC"
           values={values}
-          maxChartValues={10}
+          maxChartValues={20}
         />
       </div>
     );
