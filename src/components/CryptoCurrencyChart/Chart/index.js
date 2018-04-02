@@ -1,19 +1,25 @@
-import { compose, withState, withHandlers, lifecycle, mapProps } from 'recompose';
+import { compose, mapProps } from 'recompose';
 
 import Chart from './Chart';
 
 export default compose(
-	mapProps(({ values, width, height, yValues = 10 }) => ({
-		width,
-		height,
-		values: (() => {
-			const minY = Math.min.apply(null, values);
-			const maxY = Math.max.apply(null, values);
-			const stepY = height / (maxY - minY);
-			const stepX = width / (values.length - 1);
-			return Array.from({ length: values.length }).reduce((acc, _, i) => {
-				return [...acc, ...[i * stepX, (maxY - values[i]) * stepY]];
-			}, []);
-		})(),
-	}))
+	mapProps((props) => {
+		const { width, height, xValues = 10 } = props;
+		let { values } = props;
+		const minY = Math.min.apply(null, values);
+		const maxY = Math.max.apply(null, values);
+		const deltaY = maxY - minY;
+		const stepY = height / (deltaY === 0 ? 1 : deltaY);
+		const stepX = width / (xValues - 1);
+		values = values
+			.map((_, i) => {
+				const x = (xValues - values.length + i) * stepX;
+				const y = (maxY - values[i]) * stepY;
+				return [x, y];
+			})
+			.reduce((acc, el) => [...acc, ...el], [])
+			;
+		const polygonValues = values.length === 0 ? [] : [values[0], height, ...values, values.slice(-2)[0], height];
+		return { ...props, values, polygonValues };
+	})
 )(Chart);

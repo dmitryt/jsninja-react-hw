@@ -7,26 +7,31 @@ import Chart from './Chart';
 
 import './style.css';
 
-const CryptoCurrencyChart = ({ values, currency, baseCurrency, maxChartValues }) => (
-	<div className="b-crypto-chart">
-		<Currency value={currency} />
-		<Price values={values} currency={baseCurrency} />
-		<Chart width={600} height={200} values={values.slice(-maxChartValues)} />
+const CryptoCurrencyChart = ({ values, width, height, currency, baseCurrency, maxChartValues }) => (
+	<div className="b-crypto-chart" style={{ width }}>
+		<div className="b-crypto-chart__info">
+			<Currency value={currency} />
+			<Price value={values.slice(-1)[0]} currency={baseCurrency} />
+		</div>
+		<Chart width={width} height={height} values={values} xValues={maxChartValues} />
 	</div>
 );
 
 CryptoCurrencyChart.propTypes = {
 	currency: PropTypes.string.isRequired,
-	price: PropTypes.number.isRequired,
 	values: PropTypes.arrayOf(Number),
 	baseCurrency: PropTypes.string,
 	maxChartValues: PropTypes.number,
+	height: PropTypes.number,
+	width: PropTypes.number,
 };
 
 CryptoCurrencyChart.defaultProps = {
-	values: [],
 	baseCurrency: 'USD',
-	maxChartValues: 50,
+	maxChartValues: 20,
+	values: [],
+	height: 200,
+	width: 600,
 };
 
 export default CryptoCurrencyChart;

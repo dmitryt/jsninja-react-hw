@@ -1,23 +1,22 @@
-import { compose, withState, withHandlers, lifecycle, mapProps } from 'recompose';
+import { compose, lifecycle } from 'recompose';
 
-import { cryptoService } from '../../services';
+import CryptoService from '../../services/cryptoService';
 
 import CryptoCurrencyChart from './CryptoCurrencyChart';
 
 export default compose(
-	// lifecycle({
-	// 	componentDidMount() {
-	// 		const service = cryptoService.init({
-	// 			url: 'ws://coins-stream.demo.javascript.ninja',
-	// 			currency: 'BTC',
-	// 		});
-	// 		this.connection = service.subscribe(() => {
-
-	// 		});
-	// 	},
-
-	// 	componentWillUnmount() {
-	// 		this.connection.close();
-	// 	}
-	// })
+	lifecycle({
+		state: { values: [] },
+		componentDidMount() {
+			const { url, currency, maxChartValues } = this.props;
+			const service = new CryptoService({ url, currency });
+			this.connection = service.subscribe(price => {
+				const values = ([...this.state.values, price]).slice(-maxChartValues);
+				this.setState({ values });
+			});
+		},
+		componentWillUnmount() {
+			this.connection.close();
+		}
+	})
 )(CryptoCurrencyChart);

@@ -1,25 +1,22 @@
-import { compose, withState, withHandlers, lifecycle, mapProps } from 'recompose';
+import { compose, lifecycle } from 'recompose';
 
 import Price from './Price';
+import { getDelta } from '../../../helpers/util';
 
 export default compose(
 	lifecycle({
-		state: { value: 0, basePrice: 0 },
+		state: {},
 		componentWillMount() {
-			const basePrice = this.getLastPrice(this.props.values);
-			if (!isNaN(basePrice)) {
-				this.setState({ basePrice });
+			const { value } = this.props;
+			if (value !== undefined) {
+				this.setState({ previousValue: value, basePrice: value });
 			}
 		},
-		componentWillReceiveProps({ values }) {
-			const newValue = this.getLastPrice(values);
-			const { basePrice, value } = this.state;
-			const startDelta = basePrice === 0 ? 1 : (newValue - basePrice) / basePrice;
-			const lastDelta = value === 0 ? 1 : (newValue - value) / value;
-			this.setState({ value: newValue, startDelta, lastDelta });
-		},
-		getLastPrice(values) {
-			return values.slice(-1)[0];
+		componentWillReceiveProps({ value }) {
+			let { previousValue = value, basePrice = value } = this.state;
+			const startDelta = getDelta(value, basePrice);
+			const lastDelta = getDelta(value, previousValue);
+			this.setState({ previousValue: value, basePrice, startDelta, lastDelta });
 		}
 	})
 )(Price);

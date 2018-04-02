@@ -1,3 +1,7 @@
+.b-crypto-chart__info {
+	text-align: center;
+}
+
 .b-crypto-chart .increased {
 	color: green;
 }

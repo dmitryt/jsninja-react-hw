@@ -1,18 +1,28 @@
 
 class CryptoService {
-	constructor({url, currency}) {
-		this.socket = new WebSocket(url);
+	constructor({ url, currency }) {
+		this.url = url;
 		this.currency = currency;
 	}
 	subscribe(cb) {
 		const currency = this.currency;
-		this.socket.addEventListener('open', () => {
-			this.socket.send({ type: 'subscribe', currency });
+		const socket = new WebSocket(this.url);
+		const send = data => socket.send(JSON.stringify(data));
+		socket.addEventListener('open', () => {
+			send({ type: 'subscribe', currency });
 		}, false);
-		this.socket.addEventListener('message', cb, false)
+		socket.addEventListener('message', e => {
+			try {
+				const { price } = JSON.parse(e.data);
+				if (!isNaN(price)) {
+					cb(parseFloat(price, 10));
+				}
+			} catch (e) { }
+		}, false);
 		return {
 			close() {
-				this.socket.send({ type: 'unsubscribe', currency });
+				send({ type: 'unsubscribe', currency });
+				socket.close();
 			}
 		}
 	}

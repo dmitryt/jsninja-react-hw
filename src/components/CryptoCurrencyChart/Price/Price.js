@@ -11,18 +11,20 @@ const className = value => classNames({
 
 const Price = ({ value, currency, startDelta, lastDelta }) => (
 	<div>
-		<span className={className(lastDelta)}>{formatCurrency({ value, currency })}</span>
-		&nbsp;<span className={className(startDelta)}>({toPercent(startDelta)})</span>
+		<span className={`price ${className(lastDelta)}`}>{formatCurrency({ value, currency })}</span>
+		&nbsp;<span className={`delta ${className(startDelta)}`}>({toPercent(startDelta, 4)})</span>
 	</div>
 );
 
 Price.propTypes = {
-	value: PropTypes.number.isRequired,
+	currency: PropTypes.string.isRequired,
+	value: PropTypes.number,
 	startDelta: PropTypes.number,
 	lastDelta: PropTypes.number,
 };
 
 Price.defaultProps = {
+	value: 0,
 	startDelta: 0,
 	lastDelta: 0,
 };
