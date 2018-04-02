@@ -1,7 +1,7 @@
 import { Server } from 'mock-socket';
-import CryptoService from './cryptoService';
+import { CryptoDataProvider } from './cryptoDataProvider';
 
-describe('Service CryptoService', () => {
+describe('Service CryptoDataProvider', () => {
 	const url = 'ws://someurl.com:8080';
 	const getServer = url => new Server(url);
 
@@ -13,8 +13,8 @@ describe('Service CryptoService', () => {
 			expect(data).toEqual({ type: 'subscribe', currency: 'BTC' });
 		});
 
-		const service = new CryptoService({ url, currency: 'BTC' });
-		service.subscribe(() => { });
+		const service = new CryptoDataProvider({ url });
+		service.subscribe({ currency: 'BTC', cb: () => { } });
 		setTimeout(() => {
 			server.stop(done);
 		}, 100);
@@ -30,8 +30,8 @@ describe('Service CryptoService', () => {
 		});
 
 		const mockCb = jest.fn();
-		const service = new CryptoService({ url, currency: 'BTC' });
-		service.subscribe(mockCb);
+		const service = new CryptoDataProvider({ url });
+		service.subscribe({ currency: 'BTC', cb: mockCb });
 		setTimeout(() => {
 			expect(mockCb).toHaveBeenCalledWith(2345.56);
 			server.stop(done);
@@ -45,15 +45,15 @@ describe('Service CryptoService', () => {
 		const server = getServer(url);
 		server.on('message', data => messages.push(JSON.parse(data)));
 
-		const service = new CryptoService({ url, currency: 'BTC' });
-		const connection = service.subscribe(() => {});
+		const service = new CryptoDataProvider({ url });
+		const connection = service.subscribe({ currency: 'BTC', cb: () => { } });
 		setTimeout(() => {
 			connection.close();
 		}, 50);
 		setTimeout(() => {
 			expect(messages).toEqual([
-				{type: "subscribe", currency: "BTC"},
-				{type: "unsubscribe", currency: "BTC"},
+				{ type: "subscribe", currency: "BTC" },
+				{ type: "unsubscribe", currency: "BTC" },
 			]);
 
 			server.stop(done);

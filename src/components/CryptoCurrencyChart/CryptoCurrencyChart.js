@@ -18,6 +18,7 @@ const CryptoCurrencyChart = ({ values, width, height, currency, baseCurrency, ma
 );
 
 CryptoCurrencyChart.propTypes = {
+	dataProvider: PropTypes.object.isRequired,
 	currency: PropTypes.string.isRequired,
 	values: PropTypes.arrayOf(Number),
 	baseCurrency: PropTypes.string,
